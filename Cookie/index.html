@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie及拖拽应用</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+
+        #drag {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: url(./cat.png) no-repeat center center/cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="drag"></div>
+
+   
+
+
+    <script>
+        const manageCookie = {
+            set: function (name, value, attr) {
+                const _cookie = `${name}=${value};`
+                const _attr = Object.entries(attr)
+                    .map(item => `${item[0]}=${item[1]}`)
+                    .join(';')
+                document.cookie = _cookie.concat(_attr)
+            },
+            get: function (name) {
+                name = ' ' + name;
+                const target = document.cookie.split(';').map(item => item.split('=')).find(item => item[0] === name)
+                return target ? target[1] : null
+            },
+            remove: function (name) {
+                this.set(name, '', {
+                    'max-age': 0,
+                })
+            }
+        }
+
+        const dragDom = document.querySelector("#drag")
+        
+        const drag = {
+            init (dom) {
+                this.dom = dom;
+                this.bindEvent()
+            },
+            bindEvent() {
+                this.dom.onmousedown = this.mouseDown.bind(this)
+            },
+            mouseDown(event) {
+                document.onmousemove = this.mouseMove.bind(this)
+                document.onmouseup = this.mouseUp.bind(this)
+
+                this.startX = event.clientX - this.dom.offsetLeft;
+                this.startY = event.clientY - this.dom.offsetTop;
+                console.log(this.startX, this.startY);
+            },
+            mouseMove(event) {
+                const x = event.clientX - this.startX
+                const y = event.clientY - this.startY
+                console.log("x: " ,x, "y: ", y);
+                console.log("clientY: " ,event.clientY, "startY: ", this.startY);
+                if (x >= 0 && x <= window.innerWidth - this.dom.offsetWidth) {
+                    this.dom.style.left = x + 'px'
+                }
+                if (y >= 0 && y <= window.innerHeight - this.dom.offsetHeight) {
+                    this.dom.style.top = y + 'px'
+                }
+               
+            },
+            mouseUp(event) {
+                document.onmousemove = null
+                document.onmouseup = null
+            },
+   
+        }
+        drag.init(dragDom)
+
+    </script>
+
+
+</body>
+
+</html>
